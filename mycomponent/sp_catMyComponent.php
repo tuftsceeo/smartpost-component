@@ -44,11 +44,10 @@ if (!class_exists("sp_catMyComponent")) {
 
         /**
          * The method gets called when SmartPost is first activated and makes SmartPost aware of the name of the
-         * component, its description, and where it resides.
+         * component, its description, and where it resides. This method is inherited from the abstract
+         * "sp_catComponent" class.
          *
          * Note: The name of the component should not have any spaces in it.
-         *
-         * This method is inherited from the abstract "sp_catComponent" class.
          *
          * @see parent::installComponent()
          */
@@ -100,7 +99,7 @@ if (!class_exists("sp_catMyComponent")) {
         }
 
         /**
-         * Add content component CSS
+         * Add CSS files
          */
         static function enqueueCSS(){
             wp_register_style( 'sp_catMyComponentCSS', plugins_url('/css/sp_catMyComponent.css', __FILE__));
@@ -108,6 +107,8 @@ if (!class_exists("sp_catMyComponent")) {
         }
 
         /**
+         * Renders the HTML of the component in the template view. If there is some configurable settings that need
+         * to be set, i.e. form input elements, then they should be rendered here.
          * @see parent::componentOptions()
          */
         function componentOptions(){
@@ -118,21 +119,31 @@ if (!class_exists("sp_catMyComponent")) {
         }
 
         /**
-         * @see parent::getOptions()
-         */
-        function getOptions(){
-            return null;
-        }
-
-          /**
+         * Setter method for settings options for this component. I recommend to use the sp_core::updateVar
+         * method to save any data to the database. The table associated with 'sp_cat' options is called
+         * 'sp_catComponents'. Before saving the data, I would recommend to serialize it, especially if you have
+         * a datastructure such as a PHP object or an array.
+         *
          * @see parent::setOptions()
          */
         function setOptions($data = null){
-            return $data;
+            $data = maybe_serialize( $data );
+            return sp_core::updateVar('sp_postComponents', $this->ID, 'value', $data, '%s');
         }
 
         /**
-         * Renders the global options for this component, otherwise returns false.
+         * Accessor method that returns the options for this component.
+         * @see parent::getOptions()
+         */
+        function getOptions(){
+            return $this->options;
+        }
+
+        /**
+         * This method is responsible for the HTML that will be rendered in the SmartPost->Settings section in the
+         * Dashboard. If there are any global component settings that need to be configured, then this is where you
+         * should render them. If no global options exist, return false.
+         *
          * @return bool|string
          */
         public static function globalOptions(){
