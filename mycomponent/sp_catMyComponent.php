@@ -15,7 +15,6 @@ if (!class_exists("sp_catMyComponent")) {
      */
     class sp_catMyComponent extends sp_catComponent{
 
-
         /**
          * The constructor is used both for creating a new component and loading an existing one. If a
          * component ID is passed in to the constructor, then it will attempt to load that component.
@@ -67,8 +66,18 @@ if (!class_exists("sp_catMyComponent")) {
          * Used to initialize the component, I use this method to enqueue any styles or JavaScript libraries that
          * the component depends on. I split up these actions into the "equeueCSS" and "enqueueJS" methods, but that
          * is optional.
+         *
+         * This is also where I initialize my AJAX classes that handle AJAX calls. The AJAX class should have its own
+         * init() method that registers AJAX handlers. That way when this component is initialized, it will also be
+         * ready to process any incoming AJAX calls from the client's browser.
          */
         static function init(){
+
+            // Include the AJAX class and initialize it
+            require_once( dirname( __FILE__ ) . '/ajax/sp_catMyComponentAJAX.php');
+            sp_catAttachmentsAJAX::init();
+
+            // Include any CSS + JS
             self::enqueueCSS();
             self::enqueueJS();
         }
